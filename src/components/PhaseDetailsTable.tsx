@@ -4,9 +4,15 @@ import { NodeData } from '@/lib/types';
 
 interface PhaseDetailsTableProps {
   nodes: NodeData[];
+  hoveredNodeId: string | null;
+  onRowHover: (nodeId: string | null) => void;
 }
 
-const PhaseDetailsTable: React.FC<PhaseDetailsTableProps> = ({ nodes }) => {
+const PhaseDetailsTable: React.FC<PhaseDetailsTableProps> = ({ 
+  nodes, 
+  hoveredNodeId,
+  onRowHover
+}) => {
   // Helper to truncate long strings
   const truncate = (str: string, length: number = 8) => {
     if (!str) return '—';
@@ -29,7 +35,10 @@ const PhaseDetailsTable: React.FC<PhaseDetailsTableProps> = ({ nodes }) => {
           {nodes.map((node) => (
             <tr 
               key={node.id} 
-              className="border-b border-slate-700/50 hover:bg-slate-800/30 transition-colors"
+              className={`border-b border-slate-700/50 transition-colors 
+                ${hoveredNodeId === node.id ? 'bg-slate-700/60 ring-1 ring-crpc-blue' : 'hover:bg-slate-800/30'}`}
+              onMouseEnter={() => onRowHover(node.id)}
+              onMouseLeave={() => onRowHover(null)}
             >
               <td className="p-3">
                 <div className="flex items-center gap-2">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SimulationPhase, SimulationState, NodeData, EdgeData } from '@/lib/types';
 import { initialSimulationState, generateHexString } from '@/lib/mockData';
@@ -6,10 +5,25 @@ import NodeRingVisualization from './NodeRingVisualization';
 import SimulationStepper from './SimulationStepper';
 import PhaseDetailsTable from './PhaseDetailsTable';
 import SimulationControls from './SimulationControls';
+import InputModeToggle from './InputModeToggle';
 
 const SimulationContainer: React.FC = () => {
   const [state, setState] = useState<SimulationState>(initialSimulationState(6));
   const [autoplayInterval, setAutoplayInterval] = useState<number | null>(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
+  const [useRandomValues, setUseRandomValues] = useState(true);
+  const [nodeValues, setNodeValues] = useState<Record<string, number>>({});
+
+  // Initialize node values if needed
+  useEffect(() => {
+    if (!useRandomValues && Object.keys(nodeValues).length === 0) {
+      const initialValues: Record<string, number> = {};
+      state.nodes.forEach(node => {
+        initialValues[node.id] = 0;
+      });
+      setNodeValues(initialValues);
+    }
+  }, [useRandomValues, state.nodes]);
 
   // Effect to handle the simulation phases
   useEffect(() => {
@@ -29,20 +43,39 @@ const SimulationContainer: React.FC = () => {
     }
   }, [state.isRunning, state.isPaused]);
 
+  // Handle node value change
+  const handleNodeValueChange = (nodeId: string, value: number) => {
+    setNodeValues(prev => ({
+      ...prev,
+      [nodeId]: value
+    }));
+  };
+
+  // Toggle between random and specified values
+  const toggleRandomValues = () => {
+    setUseRandomValues(prev => !prev);
+  };
+
   // Logic for each phase of the simulation
   const processPhase = (phase: SimulationPhase): { nodes: NodeData[], edges: EdgeData[] } => {
     const { nodes, edges } = state;
     
     switch (phase) {
       case 'CommitWork': {
-        // Generate random values and commitments for each node
-        const updatedNodes = nodes.map(node => ({
-          ...node,
-          status: 'Committed' as const,
-          value: Math.floor(Math.random() * 100),
-          salt: generateHexString(8),
-          commitment: generateHexString(16),
-        }));
+        // Generate values based on mode (random or specified)
+        const updatedNodes = nodes.map(node => {
+          const value = useRandomValues 
+            ? Math.floor(Math.random() * 100) 
+            : (nodeValues[node.id] || 0);
+          
+          return {
+            ...node,
+            status: 'Committed' as const,
+            value: value,
+            salt: generateHexString(8),
+            commitment: generateHexString(16),
+          };
+        });
         
         return { nodes: updatedNodes, edges };
       }
@@ -181,6 +214,12 @@ const SimulationContainer: React.FC = () => {
     }
     
     setState(initialSimulationState(6));
+    setHoveredNodeId(null);
+  };
+  
+  // Handle node hover in visualization or table
+  const handleNodeHover = (nodeId: string | null) => {
+    setHoveredNodeId(nodeId);
   };
 
   return (
@@ -188,7 +227,12 @@ const SimulationContainer: React.FC = () => {
       {/* Left panel: 3D Node Ring */}
       <div className="w-full md:w-1/2 min-h-[400px] md:min-h-screen relative">
         <div className="absolute inset-0">
-          <NodeRingVisualization nodes={state.nodes} edges={state.edges} />
+          <NodeRingVisualization 
+            nodes={state.nodes} 
+            edges={state.edges}
+            hoveredNodeId={hoveredNodeId}
+            onNodeHover={handleNodeHover}
+          />
         </div>
         <div className="absolute bottom-4 left-4 right-4 glass-card p-4 rounded-lg max-w-sm opacity-75 hover:opacity-100 transition-opacity">
           <h3 className="text-sm font-semibold text-crpc-teal mb-1">
@@ -212,6 +256,17 @@ const SimulationContainer: React.FC = () => {
             to understand how it ensures data integrity across multiple nodes.
           </p>
           
+          {/* Input Mode Toggle - only show before commit work phase */}
+          {state.phase === 'CommitWork' && (
+            <InputModeToggle 
+              useRandomValues={useRandomValues}
+              onToggleRandomValues={toggleRandomValues}
+              nodes={state.nodes}
+              nodeValues={nodeValues}
+              onNodeValueChange={handleNodeValueChange}
+            />
+          )}
+          
           <SimulationStepper 
             currentPhase={state.phase}
             onPhaseChange={handlePhaseChange}
@@ -230,7 +285,11 @@ const SimulationContainer: React.FC = () => {
           <h2 className="text-lg font-semibold mb-4 text-crpc-teal">
             Node Status Details
           </h2>
-          <PhaseDetailsTable nodes={state.nodes} />
+          <PhaseDetailsTable 
+            nodes={state.nodes}
+            hoveredNodeId={hoveredNodeId}
+            onRowHover={handleNodeHover}
+          />
         </div>
       </div>
     </div>

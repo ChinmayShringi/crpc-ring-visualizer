@@ -8,9 +8,17 @@ interface NodesAndEdgesProps {
   nodes: NodeData[];
   edges: EdgeData[];
   nodePositions: { [key: string]: [number, number, number] };
+  hoveredNodeId: string | null;
+  onNodeHover: (nodeId: string | null) => void;
 }
 
-const NodesAndEdges: React.FC<NodesAndEdgesProps> = ({ nodes, edges, nodePositions }) => {
+const NodesAndEdges: React.FC<NodesAndEdgesProps> = ({ 
+  nodes, 
+  edges, 
+  nodePositions,
+  hoveredNodeId,
+  onNodeHover
+}) => {
   return (
     <group>
       {edges.map((edge) => (
@@ -18,6 +26,7 @@ const NodesAndEdges: React.FC<NodesAndEdgesProps> = ({ nodes, edges, nodePositio
           key={`${edge.source}-${edge.target}`} 
           edge={edge} 
           nodePositions={nodePositions} 
+          hoveredNodeId={hoveredNodeId}
         />
       ))}
       
@@ -27,6 +36,8 @@ const NodesAndEdges: React.FC<NodesAndEdgesProps> = ({ nodes, edges, nodePositio
           node={node} 
           position={nodePositions[node.id]} 
           radius={0.5}
+          isHovered={hoveredNodeId === node.id}
+          onHover={onNodeHover}
         />
       ))}
     </group>

@@ -1,16 +1,19 @@
-import React from 'react';
+
+import React, { useRef } from 'react';
 import { EdgeData } from '@/lib/types';
 import * as THREE from 'three';
-import { Line } from '@react-three/drei';
+import { Html } from '@react-three/drei';
 
 interface EdgeLineProps {
   edge: EdgeData;
   nodePositions: { [key: string]: [number, number, number] };
+  hoveredNodeId: string | null;
 }
 
-const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
+const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions, hoveredNodeId }) => {
   const sourcePos = nodePositions[edge.source];
   const targetPos = nodePositions[edge.target];
+  const lineRef = useRef<THREE.Line>(null);
   
   if (!sourcePos || !targetPos) return null;
   
@@ -54,14 +57,35 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
   const lineWidth = edge.delta ? 
     Math.min(Math.max(Math.abs(edge.delta) / 10, 1), 5) : 
     1;
+
+  // Add highlighted effect if source or target node is hovered
+  const isHighlighted = hoveredNodeId === edge.source || hoveredNodeId === edge.target;
+  const finalLineWidth = isHighlighted ? lineWidth * 1.5 : lineWidth;
   
-  // Use the Line component from drei
+  // Create geometry and material
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({ 
+    color: lineColor, 
+    linewidth: finalLineWidth
+  });
+  
+  // Determine if we should show the delta value
+  const shouldShowDelta = edge.delta !== undefined;
+  
   return (
-    <Line
-      points={points}
-      color={lineColor}
-      lineWidth={lineWidth}
-    />
+    <group>
+      <line ref={lineRef} geometry={geometry}>
+        <lineBasicMaterial attach="material" color={lineColor} linewidth={finalLineWidth} />
+      </line>
+      
+      {shouldShowDelta && (
+        <Html position={midPoint.toArray()} distanceFactor={10}>
+          <div className={`px-1.5 py-0.5 rounded text-xs text-white bg-black/70 whitespace-nowrap ${isHighlighted ? 'font-bold' : ''}`}>
+            δ = {edge.delta}
+          </div>
+        </Html>
+      )}
+    </group>
   );
 };
 
