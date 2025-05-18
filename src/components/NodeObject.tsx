@@ -14,7 +14,7 @@ interface NodeProps {
 const NodeObject: React.FC<NodeProps> = ({ node, position, radius }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Animation for the node glow effect
+  // Animation for the node glow effect - now safely used within Canvas context
   useFrame(() => {
     if (meshRef.current && node.status !== 'Pending') {
       meshRef.current.scale.x = 1 + Math.sin(Date.now() * 0.001) * 0.05;

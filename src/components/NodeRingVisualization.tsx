@@ -3,8 +3,7 @@ import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { NodeData, EdgeData } from '@/lib/types';
-import NodeObject from './NodeObject';
-import EdgeLineObject from './EdgeLineObject';
+import NodesAndEdges from './NodesAndEdges';
 
 interface NodeRingVisualizationProps {
   nodes: NodeData[];
@@ -40,25 +39,8 @@ const NodeRingVisualization: React.FC<NodeRingVisualizationProps> = ({ nodes, ed
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         
-        {/* Ring visualization - moved node and edge components inside Canvas */}
-        <group>
-          {nodes.map((node) => (
-            <NodeObject 
-              key={node.id} 
-              node={node} 
-              position={nodePositions[node.id]} 
-              radius={0.5}
-            />
-          ))}
-          
-          {edges.map((edge) => (
-            <EdgeLineObject 
-              key={`${edge.source}-${edge.target}`} 
-              edge={edge} 
-              nodePositions={nodePositions} 
-            />
-          ))}
-        </group>
+        {/* Instead of directly including NodeObject and EdgeLineObject here, use a wrapper component */}
+        <NodesAndEdges nodes={nodes} edges={edges} nodePositions={nodePositions} />
         
         <OrbitControls 
           enableZoom={true} 

@@ -48,7 +48,7 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
   
   return (
     <Line
-      points={points}
+      points={points.map(p => [p.x, p.y, p.z])}
       color={getLineColor()}
       lineWidth={getLineWidth()}
       dashed={!edge.delta}
