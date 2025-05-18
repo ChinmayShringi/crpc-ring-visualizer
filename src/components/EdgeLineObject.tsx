@@ -55,19 +55,8 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
     Math.min(Math.max(Math.abs(edge.delta) / 10, 1), 5) : 
     1;
   
-  // Create a custom line using THREE.js objects instead of drei's Line component
-  React.useEffect(() => {
-    const material = new THREE.LineBasicMaterial({ 
-      color: lineColor,
-      linewidth: lineWidth,
-    });
-    
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    return () => {
-      geometry.dispose();
-      material.dispose();
-    };
-  }, [edge, sourcePos, targetPos]);
+  // This is a more direct approach without hooks
+  const positions = new Float32Array(points.flatMap(p => [p.x, p.y, p.z]));
 
   return (
     <line>
@@ -75,7 +64,7 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
         <bufferAttribute
           attach="attributes-position"
           count={points.length}
-          array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
+          array={positions}
           itemSize={3}
         />
       </bufferGeometry>
@@ -83,7 +72,6 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
         attach="material" 
         color={lineColor} 
         linewidth={lineWidth}
-        dashed={!edge.delta} 
       />
     </line>
   );

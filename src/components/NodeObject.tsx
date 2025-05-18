@@ -28,12 +28,13 @@ const NodeObject: React.FC<NodeProps> = ({ node, position, radius }) => {
 
   // Shortened address for display
   const shortAddress = `${node.address.substring(0, 6)}...${node.address.substring(node.address.length - 4)}`;
+  const color = getNodeColor();
 
   return (
     <group position={position}>
       <mesh>
         <sphereGeometry args={[radius, 32, 16]} />
-        <meshStandardMaterial color={getNodeColor()} emissive={getNodeColor()} emissiveIntensity={0.5} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
       </mesh>
       <Text
         position={[0, radius + 0.3, 0]}
