@@ -2,7 +2,6 @@
 import React from 'react';
 import { Text } from '@react-three/drei';
 import { NodeData } from '@/lib/types';
-import * as THREE from 'three';
 
 interface NodeProps {
   node: NodeData;

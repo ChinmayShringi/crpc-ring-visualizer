@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Line } from '@react-three/drei';
 import { EdgeData } from '@/lib/types';
 import * as THREE from 'three';
 
@@ -45,7 +44,6 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
   );
   
   const points = curve.getPoints(10);
-  const pointsArray = points.map(p => [p.x, p.y, p.z] as [number, number, number]);
   
   // Determine line color based on delta value
   const lineColor = edge.delta ? 
@@ -57,13 +55,37 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
     Math.min(Math.max(Math.abs(edge.delta) / 10, 1), 5) : 
     1;
   
+  // Create a custom line using THREE.js objects instead of drei's Line component
+  React.useEffect(() => {
+    const material = new THREE.LineBasicMaterial({ 
+      color: lineColor,
+      linewidth: lineWidth,
+    });
+    
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    return () => {
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [edge, sourcePos, targetPos]);
+
   return (
-    <Line
-      points={pointsArray}
-      color={lineColor}
-      lineWidth={lineWidth}
-      dashed={!edge.delta}
-    />
+    <line>
+      <bufferGeometry attach="geometry">
+        <bufferAttribute
+          attach="attributes-position"
+          count={points.length}
+          array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial 
+        attach="material" 
+        color={lineColor} 
+        linewidth={lineWidth}
+        dashed={!edge.delta} 
+      />
+    </line>
   );
 };
 
