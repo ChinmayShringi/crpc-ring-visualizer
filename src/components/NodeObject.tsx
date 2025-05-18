@@ -1,6 +1,5 @@
 
-import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React from 'react';
 import { Text } from '@react-three/drei';
 import { NodeData } from '@/lib/types';
 import * as THREE from 'three';
@@ -12,17 +11,6 @@ interface NodeProps {
 }
 
 const NodeObject: React.FC<NodeProps> = ({ node, position, radius }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  // Animation for the node glow effect - now safely used within Canvas context
-  useFrame(() => {
-    if (meshRef.current && node.status !== 'Pending') {
-      meshRef.current.scale.x = 1 + Math.sin(Date.now() * 0.001) * 0.05;
-      meshRef.current.scale.y = 1 + Math.sin(Date.now() * 0.001) * 0.05;
-      meshRef.current.scale.z = 1 + Math.sin(Date.now() * 0.001) * 0.05;
-    }
-  });
-
   // Get color based on node status
   const getNodeColor = () => {
     switch (node.status) {
@@ -44,7 +32,7 @@ const NodeObject: React.FC<NodeProps> = ({ node, position, radius }) => {
 
   return (
     <group position={position}>
-      <mesh ref={meshRef}>
+      <mesh>
         <sphereGeometry args={[radius, 32, 16]} />
         <meshStandardMaterial color={getNodeColor()} emissive={getNodeColor()} emissiveIntensity={0.5} />
       </mesh>

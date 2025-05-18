@@ -34,6 +34,7 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
   );
   
   const points = curve.getPoints(10);
+  const pointsArray = points.map(p => [p.x, p.y, p.z]);
   
   // Determine line color and thickness based on delta value
   const getLineColor = () => {
@@ -48,7 +49,7 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
   
   return (
     <Line
-      points={points.map(p => [p.x, p.y, p.z])}
+      points={pointsArray}
       color={getLineColor()}
       lineWidth={getLineWidth()}
       dashed={!edge.delta}
