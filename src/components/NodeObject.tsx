@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Text } from '@react-three/drei';
 import { NodeData } from '@/lib/types';
+import * as THREE from 'three';
 
 interface NodeProps {
   node: NodeData;
@@ -36,24 +36,17 @@ const NodeObject: React.FC<NodeProps> = ({ node, position, radius }) => {
         <sphereGeometry args={[radius, 32, 16]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
       </mesh>
-      <Text
-        position={[0, radius + 0.3, 0]}
-        fontSize={0.2}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {shortAddress}
-      </Text>
-      <Text
-        position={[0, radius + 0.6, 0]}
-        fontSize={0.15}
-        color="#00ffe5"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {node.status}
-      </Text>
+      {/* Replace Text component with HTML overlay instead */}
+      <sprite position={[0, radius + 0.3, 0]} scale={[1, 0.3, 1]}>
+        <spriteMaterial transparent={true} opacity={0}>
+          <canvasTexture attach="map" />
+        </spriteMaterial>
+      </sprite>
+      <sprite position={[0, radius + 0.6, 0]} scale={[1, 0.3, 1]}>
+        <spriteMaterial transparent={true} opacity={0}>
+          <canvasTexture attach="map" />
+        </spriteMaterial>
+      </sprite>
     </group>
   );
 };

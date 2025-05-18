@@ -60,7 +60,7 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
 
   return (
     <line>
-      <bufferGeometry attach="geometry">
+      <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
           count={points.length}
@@ -69,7 +69,6 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
         />
       </bufferGeometry>
       <lineBasicMaterial 
-        attach="material" 
         color={lineColor} 
         linewidth={lineWidth}
       />
