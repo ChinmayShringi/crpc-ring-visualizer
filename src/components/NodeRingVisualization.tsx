@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { NodeData, EdgeData } from '@/lib/types';
@@ -30,17 +30,15 @@ const NodeRingVisualization: React.FC<NodeRingVisualizationProps> = ({ nodes, ed
   };
   
   const nodePositions = calculateNodePositions();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Add HTML labels in an overlay
+  // Render node labels outside of Canvas
   const renderNodeLabels = () => {
     return nodes.map((node) => {
       const pos = nodePositions[node.id];
       if (!pos) return null;
       
-      // Calculate 2D screen position (this is an approximation)
-      const vector = new THREE.Vector3(pos[0], pos[1] + 0.7, pos[2]);
-      // We'll position these absolutely later with CSS
+      // Calculate approximate screen position based on 3D position
+      // This is a simplified calculation for demonstration purposes
       const shortAddress = `${node.address.substring(0, 6)}...${node.address.substring(node.address.length - 4)}`;
       
       return (
@@ -63,11 +61,12 @@ const NodeRingVisualization: React.FC<NodeRingVisualizationProps> = ({ nodes, ed
   
   return (
     <div className="w-full h-full relative">
-      {/* Add 2D HTML labels above the 3D scene */}
+      {/* HTML labels overlay */}
       <div className="absolute inset-0 z-10 pointer-events-none">
         {renderNodeLabels()}
       </div>
       
+      {/* Canvas must contain all Three.js elements */}
       <Canvas
         camera={{ position: [0, 4, 6], fov: 60 }}
         style={{ background: 'transparent' }}

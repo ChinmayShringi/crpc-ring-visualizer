@@ -26,8 +26,6 @@ const NodeObject: React.FC<NodeProps> = ({ node, position, radius }) => {
     }
   };
 
-  // Shortened address for display
-  const shortAddress = `${node.address.substring(0, 6)}...${node.address.substring(node.address.length - 4)}`;
   const color = getNodeColor();
 
   return (
@@ -36,17 +34,7 @@ const NodeObject: React.FC<NodeProps> = ({ node, position, radius }) => {
         <sphereGeometry args={[radius, 32, 16]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
       </mesh>
-      {/* Replace Text component with HTML overlay instead */}
-      <sprite position={[0, radius + 0.3, 0]} scale={[1, 0.3, 1]}>
-        <spriteMaterial transparent={true} opacity={0}>
-          <canvasTexture attach="map" />
-        </spriteMaterial>
-      </sprite>
-      <sprite position={[0, radius + 0.6, 0]} scale={[1, 0.3, 1]}>
-        <spriteMaterial transparent={true} opacity={0}>
-          <canvasTexture attach="map" />
-        </spriteMaterial>
-      </sprite>
+      {/* No text components that might use hooks */}
     </group>
   );
 };

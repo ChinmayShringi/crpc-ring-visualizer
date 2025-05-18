@@ -55,7 +55,7 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
     Math.min(Math.max(Math.abs(edge.delta) / 10, 1), 5) : 
     1;
   
-  // This is a more direct approach without hooks
+  // Create a Float32Array for the positions
   const positions = new Float32Array(points.flatMap(p => [p.x, p.y, p.z]));
 
   return (
@@ -68,10 +68,7 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
           itemSize={3}
         />
       </bufferGeometry>
-      <lineBasicMaterial 
-        color={lineColor} 
-        linewidth={lineWidth}
-      />
+      <lineBasicMaterial color={lineColor} linewidth={lineWidth} />
     </line>
   );
 };
