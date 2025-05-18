@@ -40,7 +40,7 @@ const NodeRingVisualization: React.FC<NodeRingVisualizationProps> = ({ nodes, ed
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         
-        {/* Ring visualization */}
+        {/* Ring visualization - moved node and edge components inside Canvas */}
         <group>
           {nodes.map((node) => (
             <NodeObject 
