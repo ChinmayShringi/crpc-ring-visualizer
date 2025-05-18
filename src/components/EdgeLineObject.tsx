@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { EdgeData } from '@/lib/types';
 import * as THREE from 'three';
 import { Html } from '@react-three/drei';
@@ -13,7 +13,6 @@ interface EdgeLineProps {
 const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions, hoveredNodeId }) => {
   const sourcePos = nodePositions[edge.source];
   const targetPos = nodePositions[edge.target];
-  const lineRef = useRef<THREE.Line>(null);
   
   if (!sourcePos || !targetPos) return null;
   
@@ -64,18 +63,19 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions, hoveredN
   
   // Create geometry and material
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  const material = new THREE.LineBasicMaterial({ 
-    color: lineColor, 
-    linewidth: finalLineWidth
-  });
   
   // Determine if we should show the delta value
   const shouldShowDelta = edge.delta !== undefined;
   
   return (
     <group>
-      <line ref={lineRef} geometry={geometry}>
-        <lineBasicMaterial attach="material" color={lineColor} linewidth={finalLineWidth} />
+      <line>
+        <bufferGeometry attach="geometry" {...geometry} />
+        <lineBasicMaterial 
+          attach="material" 
+          color={lineColor} 
+          linewidth={finalLineWidth} 
+        />
       </line>
       
       {shouldShowDelta && (

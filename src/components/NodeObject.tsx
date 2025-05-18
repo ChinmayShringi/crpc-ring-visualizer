@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { NodeData } from '@/lib/types';
-import * as THREE from 'three';
 import { Html } from '@react-three/drei';
 
 interface NodeProps {
