@@ -35,30 +35,11 @@ const NodeRingVisualization: React.FC<NodeRingVisualizationProps> = ({ nodes, ed
       <Canvas
         camera={{ position: [0, 4, 6], fov: 60 }}
         style={{ background: 'transparent' }}
-        onCreated={({ gl, scene, camera }) => {
-          gl.setPixelRatio(window.devicePixelRatio);
-          
-          // Simple animation function that doesn't rely on hooks
-          let animationId: number;
-          
-          const animate = () => {
-            animationId = requestAnimationFrame(animate);
-            // Animation code here if needed
-            gl.render(scene, camera);
-          };
-          
-          animate();
-          
-          // Clean up animation when component unmounts
-          return () => {
-            cancelAnimationFrame(animationId);
-          };
-        }}
+        gl={{ antialias: true }}
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         
-        {/* Use the NodesAndEdges component */}
         <NodesAndEdges nodes={nodes} edges={edges} nodePositions={nodePositions} />
         
         <OrbitControls 

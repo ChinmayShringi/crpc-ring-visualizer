@@ -16,6 +16,10 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
   if (!sourcePos || !targetPos) return null;
   
   // Calculate points for the curved line
+  const sourcePosVector = new THREE.Vector3(...sourcePos);
+  const targetPosVector = new THREE.Vector3(...targetPos);
+  
+  // Calculate the midpoint
   const midPoint = new THREE.Vector3(
     (sourcePos[0] + targetPos[0]) / 2,
     (sourcePos[1] + targetPos[1]) / 2,
@@ -23,35 +27,41 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
   );
   
   // Push the midpoint outward a bit to create a curve
-  midPoint.normalize().multiplyScalar(1.1 * Math.sqrt(
-    sourcePos[0] * sourcePos[0] + sourcePos[1] * sourcePos[1] + sourcePos[2] * sourcePos[2]
-  ));
+  const midPointDistance = Math.sqrt(
+    midPoint.x * midPoint.x + 
+    midPoint.y * midPoint.y + 
+    midPoint.z * midPoint.z
+  );
   
+  if (midPointDistance > 0) {
+    midPoint.normalize().multiplyScalar(1.1 * midPointDistance);
+  }
+  
+  // Create points for a simple curve
   const curve = new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(...sourcePos),
-    new THREE.Vector3(midPoint.x, midPoint.y, midPoint.z),
-    new THREE.Vector3(...targetPos)
+    sourcePosVector,
+    midPoint,
+    targetPosVector
   );
   
   const points = curve.getPoints(10);
-  const pointsArray = points.map(p => [p.x, p.y, p.z]);
+  const pointsArray = points.map(p => [p.x, p.y, p.z] as [number, number, number]);
   
-  // Determine line color and thickness based on delta value
-  const getLineColor = () => {
-    if (!edge.delta) return "#3a4a64";
-    return edge.delta > 0 ? "#00ffe5" : "#ff4242";
-  };
+  // Determine line color based on delta value
+  const lineColor = edge.delta ? 
+    (edge.delta > 0 ? "#00ffe5" : "#ff4242") : 
+    "#3a4a64";
   
-  const getLineWidth = () => {
-    if (!edge.delta) return 1;
-    return Math.min(Math.max(Math.abs(edge.delta) / 10, 1), 5);
-  };
+  // Determine line width based on delta value
+  const lineWidth = edge.delta ? 
+    Math.min(Math.max(Math.abs(edge.delta) / 10, 1), 5) : 
+    1;
   
   return (
     <Line
       points={pointsArray}
-      color={getLineColor()}
-      lineWidth={getLineWidth()}
+      color={lineColor}
+      lineWidth={lineWidth}
       dashed={!edge.delta}
     />
   );
