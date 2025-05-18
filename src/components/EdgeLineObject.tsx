@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { EdgeData } from '@/lib/types';
 import * as THREE from 'three';
+import { Line } from '@react-three/drei';
 
 interface EdgeLineProps {
   edge: EdgeData;
@@ -55,21 +55,13 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions }) => {
     Math.min(Math.max(Math.abs(edge.delta) / 10, 1), 5) : 
     1;
   
-  // Create a Float32Array for the positions
-  const positions = new Float32Array(points.flatMap(p => [p.x, p.y, p.z]));
-
+  // Use the Line component from drei
   return (
-    <line>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={points.length}
-          array={positions}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <lineBasicMaterial color={lineColor} linewidth={lineWidth} />
-    </line>
+    <Line
+      points={points}
+      color={lineColor}
+      lineWidth={lineWidth}
+    />
   );
 };
 
