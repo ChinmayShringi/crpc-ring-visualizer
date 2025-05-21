@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { EdgeData } from '@/lib/types';
 import * as THREE from 'three';
 import { Html } from '@react-three/drei';
@@ -14,17 +13,15 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions, hoveredN
   const sourcePos = nodePositions[edge.source];
   const targetPos = nodePositions[edge.target];
   
-  if (!sourcePos || !targetPos) return null;
-  
   // Calculate points for the curved line
-  const sourcePosVector = new THREE.Vector3(...sourcePos);
-  const targetPosVector = new THREE.Vector3(...targetPos);
+  const sourcePosVector = new THREE.Vector3(...(sourcePos || [0, 0, 0]));
+  const targetPosVector = new THREE.Vector3(...(targetPos || [0, 0, 0]));
   
   // Calculate the midpoint
   const midPoint = new THREE.Vector3(
-    (sourcePos[0] + targetPos[0]) / 2,
-    (sourcePos[1] + targetPos[1]) / 2,
-    (sourcePos[2] + targetPos[2]) / 2
+    ((sourcePos?.[0] || 0) + (targetPos?.[0] || 0)) / 2,
+    ((sourcePos?.[1] || 0) + (targetPos?.[1] || 0)) / 2,
+    ((sourcePos?.[2] || 0) + (targetPos?.[2] || 0)) / 2
   );
   
   // Push the midpoint outward a bit to create a curve
@@ -61,22 +58,26 @@ const EdgeLineObject: React.FC<EdgeLineProps> = ({ edge, nodePositions, hoveredN
   const isHighlighted = hoveredNodeId === edge.source || hoveredNodeId === edge.target;
   const finalLineWidth = isHighlighted ? lineWidth * 1.5 : lineWidth;
   
-  // Create geometry and material
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  // Create geometry and material using useMemo to prevent unnecessary recreations
+  const { geometry, material } = useMemo(() => {
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({ 
+      color: lineColor,
+      transparent: true,
+      opacity: isHighlighted ? 1 : 0.7
+    });
+    return { geometry, material };
+  }, [points, lineColor, isHighlighted]);
+  
+  if (!sourcePos || !targetPos) return null;
   
   // Determine if we should show the delta value
   const shouldShowDelta = edge.delta !== undefined;
   
   return (
     <group>
-      <line>
-        <bufferGeometry attach="geometry" {...geometry} />
-        <lineBasicMaterial 
-          attach="material" 
-          color={lineColor} 
-          linewidth={finalLineWidth} 
-        />
-      </line>
+      <primitive object={geometry} />
+      <primitive object={material} />
       
       {shouldShowDelta && (
         <Html position={midPoint.toArray()} distanceFactor={10}>
